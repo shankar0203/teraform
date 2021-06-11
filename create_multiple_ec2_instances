@@ -1,0 +1,38 @@
+#create multiple ec2_instances
+
+
+------------------------------------------------------------------------------
+#resource file
+--------------
+provider "aws" {       
+  region = "us-east-1"
+}
+
+resource "aws_instance" "my-machine" {
+  count = 4                     
+  
+  ami = var.ami
+  instance_type = var.instance_type
+  tags = {
+    Name = "my-machine-${count.index}"
+         }
+}
+
+---------------------------------------------------------------------------
+
+
+
+# var_file_for launch_multiple instances
+----------------------------------------
+variable "ami" {       
+  type = string
+  default = "ami-0aeeebd8d2ab47354"
+}
+variable "instance_type" {    
+  type = string
+  default = "t2.micro"
+}
+
+
+
+-----------------------------------------------------------------------------

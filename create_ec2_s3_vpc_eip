@@ -1,0 +1,68 @@
+##  THIS CODE FOR CREATE THE EC2 , S3 ,ELASTIC_IP , VPC ,AND ALSO CLOUD WATCH FOR EC2_CPU_UTILIZATION
+
+
+provider "aws" {
+   region = "us-east-1"
+}
+
+
+# creation of VPC
+  
+  resource "aws_vpc" "my_vpc" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+      Name = "terraform_my_vpc"
+  }  
+}
+
+
+# EC2 creation
+
+resource "aws_eip" "my_eip" {
+  instance   = aws_instance.my_instance.id
+  
+  
+}
+
+resource "aws_instance" "my_instance" {
+  ami               = "ami-0aeeebd8d2ab47354"
+   instance_type     = "t2.micro"
+  tags ={
+      Name = "my_ec2_instances"
+  }
+}
+
+
+# S3 creation
+
+resource "aws_s3_bucket" "my_s3_bucket" {
+  bucket = "my-s3-21-06"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    
+  }
+}
+
+
+
+# cloud watch alarm
+
+resource "aws_cloudwatch_metric_alarm" "cloud_watch_alarm" {
+  alarm_name                = "ec2_CPU_utilization"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "2"
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/EC2"
+  period                    = "120"
+  statistic                 = "Average"
+  threshold                 = "80"
+  alarm_description         = "This metric monitors ec2 cpu utilization"
+  dimensions = {
+    InstanceId = "{aws_instance.my_instance.id}"
+  }
+
+}
+
+-------------------------------------------------------

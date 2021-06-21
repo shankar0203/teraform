@@ -66,3 +66,76 @@ resource "aws_cloudwatch_metric_alarm" "cloud_watch_alarm" {
 }
 
 -------------------------------------------------------
+
+
+
+
+This code for spot instance with elastic_ip and vpc and s3 and cloudwatch
+
+provider "aws"{
+  region = "us-east-1"
+}
+
+
+# creation of VPC
+  
+  resource "aws_vpc" "my_vpc" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+      Name = "terraform_my_vpc"
+  }  
+}
+
+
+# EC2 creation
+
+resource "aws_eip" "my_eip" {
+  instance = aws_spot_instance_request.my_instance.ami
+  
+  
+}
+
+  resource "aws_spot_instance_request" "my_instance" {
+  ami                    = "ami-0aeeebd8d2ab47354"
+  spot_price             = "0.016"
+  instance_type          = "t2.medium"
+  spot_type              = "one-time"
+  block_duration_minutes = "120"
+  wait_for_fulfillment   = "true"
+  key_name               = "spot_key"
+}
+
+
+
+# S3 creation
+
+resource "aws_s3_bucket" "my_s3_bucket" {
+  bucket = "my-s3-21-06"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    
+  }
+}
+
+
+
+# cloud watch alarm
+
+resource "aws_cloudwatch_metric_alarm" "cloud_watch_alarm" {
+  alarm_name                = "ec2_CPU_utilization"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "2"
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/EC2"
+  period                    = "120"
+  statistic                 = "Average"
+  threshold                 = "80"
+  alarm_description         = "This metric monitors ec2 cpu utilization"
+  dimensions = {
+    InstanceId = "{aws_instance.my_instance.id}"
+  }
+
+}
+

@@ -146,4 +146,11 @@ bucket ="${aws_s3_bucket.bucket.id}"
 key= "sample.txt"
 source="location"
 }
+----
+
+upload multiple files
+
+resource ="null_resource" "multiple"
+  provisioner "local-exec"
+    command = "aws s3 sync D:\\misc s2://bucket name"
 
